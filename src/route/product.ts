@@ -12,7 +12,7 @@ import { fileParser } from "@/middleware/file";
 const productRouter = Router();
 
 productRouter.get("/", getAllProducts);
-productRouter.get("/:id", getProduct);
+productRouter.get("/:id", getProduct); 
 
 productRouter.post("/", isAuthenticated, isAdmin, fileParser, createProduct);
 productRouter.put("/:id", isAuthenticated, isAdmin, fileParser, updateProduct);
