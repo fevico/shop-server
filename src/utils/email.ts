@@ -1,9 +1,8 @@
-import { SendMailClient } from "zeptomail";
+import { Resend } from "resend";
 
 const getClient = () => {
-  const url = process.env.ZEPTO_API_URL!;
-  const token = process.env.ZEPTO_API_TOKEN!;
-  return new SendMailClient({ url, token });
+  const apiKey = process.env.RESEND_API_KEY!;
+  return new Resend(apiKey);
 };
 
 interface SendEmailOptions {
@@ -13,23 +12,13 @@ interface SendEmailOptions {
   html: string;
 }
 
-export const sendEmail = async ({ to, toName, subject, html }: SendEmailOptions) => {
-  const client = getClient();
+export const sendEmail = async ({ to, subject, html }: SendEmailOptions) => {
+  const resend = getClient();
 
-  await client.sendMail({
-    from: {
-      address: process.env.ZEPTO_FROM_EMAIL!,
-      name: process.env.ZEPTO_FROM_NAME || "Shop",
-    },
-    to: [
-      {
-        email_address: {
-          address: to,
-          name: toName,
-        },
-      },
-    ],
+  await resend.emails.send({
+    from: `${process.env.RESEND_FROM_NAME || "Shop"} <${process.env.RESEND_FROM_EMAIL!}>`,
+    to,
     subject,
-    htmlbody: html,
+    html,
   });
 };

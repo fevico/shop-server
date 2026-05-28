@@ -1,5 +1,5 @@
 const brandColor = "#4F46E5";
-const brandName = process.env.ZEPTO_FROM_NAME || "Shop";
+const brandName = process.env.RESEND_FROM_NAME || "Shop";
 
 const baseTemplate = (content: string) => `
 <!DOCTYPE html>
@@ -28,6 +28,20 @@ const baseTemplate = (content: string) => `
     .footer { background: #f9f9fb; padding: 24px 40px; text-align: center; }
     .footer p { font-size: 12px; color: #999; line-height: 1.6; }
     .footer a { color: ${brandColor}; text-decoration: none; }
+    /* Order confirmation styles */
+    .order-badge { display: inline-block; background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; border-radius: 999px; padding: 6px 18px; font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+    .order-info { background: #f8f8ff; border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+    .order-info-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #ebebeb; }
+    .order-info-row:last-child { border-bottom: none; }
+    .order-info-row span:first-child { color: #888; }
+    .order-info-row span:last-child { font-weight: 600; color: #1a1a2e; }
+    .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .items-table th { background: ${brandColor}; color: #fff; font-size: 13px; font-weight: 600; padding: 10px 14px; text-align: left; }
+    .items-table td { font-size: 14px; padding: 12px 14px; border-bottom: 1px solid #f0f0f0; color: #444; vertical-align: middle; }
+    .items-table tr:last-child td { border-bottom: none; }
+    .items-table .item-img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; background: #f0f0f0; }
+    .total-row { background: #f0f0ff; }
+    .total-row td { font-weight: 700; font-size: 15px; color: #1a1a2e; }
   </style>
 </head>
 <body>
@@ -116,3 +130,94 @@ export const passwordChangedEmailTemplate = (name: string) =>
       <strong>Didn't change your password?</strong> Your account may be at risk. Please contact our support team immediately.
     </div>
   `);
+
+export interface OrderConfirmationItem {
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
+export const orderConfirmationEmailTemplate = (
+  name: string,
+  orderNumber: string,
+  reference: string,
+  items: OrderConfirmationItem[],
+  totalAmount: number,
+  shippingAddress?: {
+    fullName: string;
+    address: string;
+    city: string;
+  }
+) => {
+  const itemRows = items
+    .map(
+      (item) => `
+    <tr>
+      <td>
+        ${
+          item.image
+            ? `<img src="${item.image}" alt="${item.name}" class="item-img" />`
+            : `<div class="item-img" style="display:inline-block;"></div>`
+        }
+      </td>
+      <td><strong>${item.name}</strong></td>
+      <td style="text-align:center;">${item.quantity}</td>
+      <td style="text-align:right;">₦${(item.price * item.quantity).toLocaleString("en-NG", { minimumFractionDigits: 2 })}</td>
+    </tr>`
+    )
+    .join("");
+
+  const shippingBlock = shippingAddress
+    ? `
+    <hr class="divider" />
+    <h2 style="font-size:17px; margin-bottom:12px;">Shipping To</h2>
+    <div class="order-info">
+      <div class="order-info-row"><span>Name</span><span>${shippingAddress.fullName}</span></div>
+      <div class="order-info-row"><span>Address</span><span>${shippingAddress.address}</span></div>
+      <div class="order-info-row"><span>City</span><span>${shippingAddress.city}</span></div>
+    </div>`
+    : "";
+
+  return baseTemplate(`
+    <div style="text-align:center;">
+      <span class="order-badge">✅ Order Confirmed</span>
+    </div>
+
+    <h2>Thank you for your order, ${name || "there"}!</h2>
+    <p>We've received your order and it's being processed. You'll receive another email when your items are on the way.</p>
+
+    <div class="order-info">
+      <div class="order-info-row"><span>Order Number</span><span>#${orderNumber}</span></div>
+      <div class="order-info-row"><span>Payment Reference</span><span>${reference}</span></div>
+      <div class="order-info-row"><span>Date</span><span>${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</span></div>
+      <div class="order-info-row"><span>Status</span><span style="color:#065f46;">Paid ✓</span></div>
+    </div>
+
+    <hr class="divider" />
+    <h2 style="font-size:17px; margin-bottom:12px;">Order Summary</h2>
+
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width:56px;"></th>
+          <th>Item</th>
+          <th style="text-align:center;">Qty</th>
+          <th style="text-align:right;">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemRows}
+        <tr class="total-row">
+          <td colspan="3" style="text-align:right; padding-right:14px;">Total</td>
+          <td style="text-align:right;">₦${totalAmount.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    ${shippingBlock}
+
+    <hr class="divider" />
+    <p style="font-size:14px; color:#777;">Have a question about your order? Reply to this email or contact our support team.</p>
+  `);
+};
