@@ -26,6 +26,6 @@ paymentRouter.get("/my-orders", isAuthenticated, getMyOrders);
 paymentRouter.get("/admin/dashboard-stats", isAuthenticated, isAdmin, getAdminDashboardStats);
 paymentRouter.get("/orders", isAuthenticated, isAdmin, getAllOrders);
 paymentRouter.get("/orders/:id", isAuthenticated, isAdmin, getOrderById);  
-paymentRouter.patch("/orders/:id/status", isAuthenticated, isAdmin, updateOrderStatus);
+paymentRouter.patch("/orders/:id/status", isAuthenticated, isAdmin, updateOrderStatus); 
 
 export default paymentRouter;
