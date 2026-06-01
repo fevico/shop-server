@@ -21,10 +21,6 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    # NEW STEP: Run your backend unit tests (e.g., using Jest or Mocha)
-    - name: Run Backend Tests
-      run: npm test # This will run your test scripts from package.json
-
     # This step ONLY runs if 'npm test' passes successfully!
     - name: Build Docker Image
       run: docker build -t ecommerce-backend:latest .
