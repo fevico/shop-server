@@ -1,33 +1,30 @@
-name: E-commerce Backend Docker Build
+name: E-commerce Backend CI/CD
 
 on:
   push:
-    branches: [ "master" ] # Triggers the build whenever you push to master
-  pull_request:
     branches: [ "master" ]
 
 jobs:
-  build-express-image:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Pull down your Express backend code from GitHub into the cloud runner
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    # 2. Set up Node.js environment on the runner (good for caching/testing steps later)
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
-    # 3. Tell the cloud server to read your Dockerfile and compile the Image
-    - name: Build Docker Image
-      run: |
-        echo "🔨 Building your Express E-commerce Docker Image..."
-        docker build -t ecommerce-backend:latest .
-        echo "✅ Image built successfully without compilation errors!"
+    # NEW STEP: Install your packages directly onto the Ubuntu machine
+    - name: Install Dependencies
+      run: npm install
 
-    # 4. Optional: Run a quick sanity check to ensure the built image can list files
-    - name: Verify Built Image
-      run: docker images | grep ecommerce-backend
+    # NEW STEP: Run your backend unit tests (e.g., using Jest or Mocha)
+    - name: Run Backend Tests
+      run: npm test # This will run your test scripts from package.json
+
+    # This step ONLY runs if 'npm test' passes successfully!
+    - name: Build Docker Image
+      run: docker build -t ecommerce-backend:latest .

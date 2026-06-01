@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Step 4: Copy the rest of your Express app files
+# Step 4: Copy the rest of your Express app files 
 COPY . .
 
 # Step 5: Tell the container to open port 5000
