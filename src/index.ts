@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/auth", authRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
-app.use("/api/payment", paymentRouter);
+app.use("/api/payment", paymentRouter); 
 
 app.use(errorHandler);
 

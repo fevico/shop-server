@@ -79,11 +79,11 @@ export const updateCategory: RequestHandler = async (req, res) => {
 // DELETE /api/categories/:id
 export const deleteCategory: RequestHandler = async (req, res) => {
   const category = await CategoryModel.findById(req.params.id);
-
+ 
   if (!category) {
     res.status(404).json({ error: "Category not found." });
     return;
-  }
+  } 
 
   if (category.image?.id) {
     await deleteImage(category.image.id);

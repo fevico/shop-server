@@ -23,4 +23,4 @@ jobs:
 
     # This step ONLY runs if 'npm test' passes successfully!
     - name: Build Docker Image
-      run: docker build -t ecommerce-backend:latest .
+      run: docker build -t ecommerce-backend:latest .  
