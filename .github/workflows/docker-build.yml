@@ -1,11 +1,11 @@
-name: E-commerce Backend CI/CD
+name: E-commerce Backend CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
-  test-and-build:
+  build-and-ship:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +17,22 @@ jobs:
       with:
         node-version: '20'
 
-    # NEW STEP: Install your packages directly onto the Ubuntu machine
     - name: Install Dependencies
       run: npm install
 
-    # This step ONLY runs if 'npm test' passes successfully!
-    - name: Build Docker Image
-      run: docker build -t ecommerce-backend:latest .  
+    # Log into Docker Hub using your secure repository secrets
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # Build and automatically tag the image with your Docker Hub repo address
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          fevico/ecommerce-backend:latest
+          fevico/ecommerce-backend:${{ github.sha }}
