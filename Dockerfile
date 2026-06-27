@@ -18,4 +18,4 @@ RUN npm run build
 EXPOSE 5000
 
 # Step 7: Run the compiled JavaScript file (usually inside the 'dist' folder)
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/index.js"]
